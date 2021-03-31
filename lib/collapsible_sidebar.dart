@@ -8,6 +8,7 @@ import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item_selection.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_avatar.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item_widget.dart';
+import 'package:flutter/rendering.dart';
 
 export 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
 
@@ -85,6 +86,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   @override
   void initState() {
     super.initState();
+    _selectedItemIndex = 0;
 
     tempWidth = widget.maxWidth > 270 ? 270 : widget.maxWidth;
 
@@ -159,86 +161,99 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
           padding: EdgeInsets.only(left: widget.minWidth * 1.1),
           child: widget.body,
         ),
-        Padding(
-          padding: EdgeInsets.all(widget.screenPadding),
-          child: GestureDetector(
-            onHorizontalDragUpdate: _onHorizontalDragUpdate,
-            onHorizontalDragEnd: _onHorizontalDragEnd,
-            child: CollapsibleContainer(
-              height: widget.height,
-              width: _currWidth,
-              padding: widget.padding,
-              borderRadius: widget.borderRadius,
-              color: widget.backgroundColor,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _avatar,
-                  SizedBox(
-                    height: widget.topPadding,
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      reverse: widget.fitItemsToBottom,
-                      child: Stack(
-                        children: [
-                          CollapsibleItemSelection(
-                            height: _maxOffsetY,
-                            offsetY: _maxOffsetY * _selectedItemIndex,
-                            color: widget.selectedIconBox,
-                            duration: widget.duration,
-                            curve: widget.curve,
+        MouseRegion(
+            onEnter: (_) {
+              _isCollapsed = false;
+              var endWidth = _isCollapsed ? widget.minWidth : tempWidth;
+              _animateTo(endWidth);
+            },
+            onExit: (_) {
+              _isCollapsed = true;
+              var endWidth = _isCollapsed ? widget.minWidth : tempWidth;
+              _animateTo(endWidth);
+            },
+            child: Padding(
+              padding: EdgeInsets.all(widget.screenPadding),
+              child: GestureDetector(
+                onHorizontalDragUpdate: _onHorizontalDragUpdate,
+                onHorizontalDragEnd: _onHorizontalDragEnd,
+                child: CollapsibleContainer(
+                  height: widget.height,
+                  width: _currWidth,
+                  padding: widget.padding,
+                  borderRadius: widget.borderRadius,
+                  color: widget.backgroundColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _avatar,
+                      SizedBox(height: widget.topPadding),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          reverse: widget.fitItemsToBottom,
+                          child: Stack(
+                            children: [
+                              CollapsibleItemSelection(
+                                height: _maxOffsetY,
+                                offsetY: _maxOffsetY * _selectedItemIndex,
+                                color: widget.selectedIconBox,
+                                duration: widget.duration,
+                                curve: widget.curve,
+                              ),
+                              Column(
+                                children: _items,
+                              ),
+                            ],
                           ),
-                          Column(
-                            children: _items,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      SizedBox(
+                        height: widget.bottomPadding,
+                      ),
+                      widget.showToggleButton
+                          ? Divider(
+                              color: widget.unselectedIconColor,
+                              indent: 5,
+                              endIndent: 5,
+                              thickness: 1,
+                            )
+                          : SizedBox(
+                              height: 5,
+                            ),
+                      widget.showToggleButton
+                          ? _toggleButton
+                          : SizedBox(
+                              height: widget.iconSize,
+                            ),
+                    ],
                   ),
-                  SizedBox(
-                    height: widget.bottomPadding,
-                  ),
-                  widget.showToggleButton
-                      ? Divider(
-                          color: widget.unselectedIconColor,
-                          indent: 5,
-                          endIndent: 5,
-                          thickness: 1,
-                        )
-                      : SizedBox(
-                          height: 5,
-                        ),
-                  widget.showToggleButton
-                      ? _toggleButton
-                      : SizedBox(
-                          height: widget.iconSize,
-                        ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
+            )),
       ],
     );
   }
 
   Widget get _avatar {
-    return CollapsibleItemWidget(
-      padding: widget.itemPadding,
-      offsetX: _offsetX,
-      scale: _fraction,
-      leading: CollapsibleAvatar(
-        backgroundColor: widget.unselectedIconColor,
-        avatarSize: widget.iconSize,
-        name: widget.title,
-        avatarImg: widget.avatarImg,
-        textStyle: _textStyle(widget.backgroundColor, widget.titleStyle),
-      ),
-      title: widget.title,
-      textStyle: _textStyle(widget.unselectedTextColor, widget.titleStyle),
-    );
+    if (widget.avatarImg != null) {
+      return CollapsibleItemWidget(
+        padding: widget.itemPadding,
+        offsetX: _offsetX,
+        scale: _fraction,
+        leading: CollapsibleAvatar(
+          backgroundColor: widget.unselectedIconColor,
+          avatarSize: widget.iconSize,
+          name: widget.title,
+          avatarImg: widget.avatarImg,
+          textStyle: _textStyle(widget.backgroundColor, widget.titleStyle),
+        ),
+        title: widget.title,
+        textStyle: _textStyle(widget.unselectedTextColor, widget.titleStyle),
+      );
+    } else {
+      return SizedBox();
+    }
   }
 
   List<Widget> get _items {
