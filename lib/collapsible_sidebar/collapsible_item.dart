@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class CollapsibleItem {
+abstract class BaseCollapsibleItem {}
+
+class CollapsibleItem extends BaseCollapsibleItem {
   CollapsibleItem({
     @required this.text,
     @required this.icon,
@@ -15,3 +17,5 @@ class CollapsibleItem {
   final Function onPressed;
   bool isSelected;
 }
+
+class SeparatorItem extends BaseCollapsibleItem {}

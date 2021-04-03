@@ -40,6 +40,7 @@ class CollapsibleSidebar extends StatefulWidget {
     this.topPadding = 0,
     this.bottomPadding = 0,
     this.fitItemsToBottom = false,
+    this.initialSelection,
     @required this.body,
   });
 
@@ -48,7 +49,7 @@ class CollapsibleSidebar extends StatefulWidget {
   final Widget body;
   final avatarImg;
   final bool showToggleButton, fitItemsToBottom;
-  final List<CollapsibleItem> items;
+  final List<BaseCollapsibleItem> items;
   final double height,
       minWidth,
       maxWidth,
@@ -68,6 +69,7 @@ class CollapsibleSidebar extends StatefulWidget {
       unselectedTextColor;
   final Duration duration;
   final Curve curve;
+  final int initialSelection;
   @override
   _CollapsibleSidebarState createState() => _CollapsibleSidebarState();
 }
@@ -86,7 +88,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   @override
   void initState() {
     super.initState();
-    _selectedItemIndex = 0;
+    _selectedItemIndex = widget.initialSelection ?? 0;
 
     tempWidth = widget.maxWidth > 270 ? 270 : widget.maxWidth;
 
@@ -97,7 +99,8 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     _maxOffsetX = widget.padding * 2 + widget.iconSize;
     _maxOffsetY = widget.itemPadding * 2 + widget.iconSize;
     for (var i = 0; i < widget.items.length; i++) {
-      if (!widget.items[i].isSelected) continue;
+      if (!(widget.items[i] is CollapsibleItem) ||
+          !(widget.items[i] as CollapsibleItem).isSelected) continue;
       _selectedItemIndex = i;
       break;
     }
@@ -196,7 +199,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                             children: [
                               CollapsibleItemSelection(
                                 height: _maxOffsetY,
-                                offsetY: _maxOffsetY * _selectedItemIndex,
+                                offsetY: getOffsetY(),
                                 color: widget.selectedIconBox,
                                 duration: widget.duration,
                                 curve: widget.curve,
@@ -259,31 +262,42 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   List<Widget> get _items {
     return List.generate(widget.items.length, (index) {
       var item = widget.items[index];
-      var iconColor = widget.unselectedIconColor;
-      var textColor = widget.unselectedTextColor;
-      if (item.isSelected) {
-        iconColor = widget.selectedIconColor;
-        textColor = widget.selectedTextColor;
-      }
-      return CollapsibleItemWidget(
-        padding: widget.itemPadding,
-        offsetX: _offsetX,
-        scale: _fraction,
-        leading: Icon(
-          item.icon,
-          size: widget.iconSize,
-          color: iconColor,
-        ),
-        title: item.text,
-        textStyle: _textStyle(textColor, widget.textStyle),
-        onTap: () {
-          if (item.isSelected) return;
-          item.onPressed();
-          item.isSelected = true;
-          widget.items[_selectedItemIndex].isSelected = false;
-          setState(() => _selectedItemIndex = index);
-        },
-      );
+      if (item is CollapsibleItem) {
+        var iconColor = widget.unselectedIconColor;
+        var textColor = widget.unselectedTextColor;
+        if (item.isSelected) {
+          iconColor = widget.selectedIconColor;
+          textColor = widget.selectedTextColor;
+        }
+        return CollapsibleItemWidget(
+          padding: widget.itemPadding,
+          offsetX: _offsetX,
+          scale: _fraction,
+          leading: Icon(
+            item.icon,
+            size: widget.iconSize,
+            color: iconColor,
+          ),
+          title: item.text,
+          textStyle: _textStyle(textColor, widget.textStyle),
+          onTap: () {
+            if (item.isSelected) return;
+            item.onPressed();
+            item.isSelected = true;
+            (widget.items[_selectedItemIndex] as CollapsibleItem).isSelected =
+                false;
+            setState(() => _selectedItemIndex = index);
+          },
+        );
+      } else if (item is SeparatorItem) {
+        return Divider(
+          color: widget.unselectedIconColor,
+          indent: 5,
+          endIndent: 5,
+          thickness: 1,
+        );
+      } else
+        return SizedBox();
     });
   }
 
@@ -329,5 +343,17 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  double getOffsetY() {
+    double offSet = 0;
+    widget.items.sublist(0, _selectedItemIndex).forEach((element) {
+      if (element is CollapsibleItem) {
+        offSet += _maxOffsetY;
+      } else if (element is SeparatorItem) {
+        offSet += 16;
+      }
+    });
+    return offSet;
   }
 }
