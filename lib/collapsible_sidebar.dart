@@ -40,7 +40,6 @@ class CollapsibleSidebar extends StatefulWidget {
     this.topPadding = 0,
     this.bottomPadding = 0,
     this.fitItemsToBottom = false,
-    this.initialSelection,
     @required this.body,
   });
 
@@ -69,7 +68,6 @@ class CollapsibleSidebar extends StatefulWidget {
       unselectedTextColor;
   final Duration duration;
   final Curve curve;
-  final int initialSelection;
   @override
   _CollapsibleSidebarState createState() => _CollapsibleSidebarState();
 }
@@ -88,7 +86,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   @override
   void initState() {
     super.initState();
-    _selectedItemIndex = widget.initialSelection ?? 0;
+    _selectedItemIndex = 0;
 
     tempWidth = widget.maxWidth > 270 ? 270 : widget.maxWidth;
 
@@ -281,11 +279,14 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
           title: item.text,
           textStyle: _textStyle(textColor, widget.textStyle),
           onTap: () {
-            if (item.isSelected) return;
+            bool lastState = item.isSelected;
             item.onPressed();
             item.isSelected = true;
-            (widget.items[_selectedItemIndex] as CollapsibleItem).isSelected =
-                false;
+            if (widget.items[_selectedItemIndex] is CollapsibleItem) {
+              (widget.items[_selectedItemIndex] as CollapsibleItem).isSelected =
+                  false;
+            }
+            if (lastState) return;
             setState(() => _selectedItemIndex = index);
           },
         );
