@@ -40,9 +40,11 @@ class CollapsibleSidebar extends StatefulWidget {
     this.topPadding = 0,
     this.bottomPadding = 0,
     this.fitItemsToBottom = false,
+    this.top,
     @required this.body,
   });
 
+  final Widget top;
   final String title, toggleTitle;
   final TextStyle titleStyle, textStyle, toggleTitleStyle;
   final Widget body;
@@ -237,21 +239,22 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   }
 
   Widget get _avatar {
-    if (widget.avatarImg != null) {
-      return CollapsibleItemWidget(
-        padding: widget.itemPadding,
-        offsetX: _offsetX,
-        scale: _fraction,
-        leading: CollapsibleAvatar(
-          backgroundColor: widget.unselectedIconColor,
-          avatarSize: widget.iconSize,
-          name: widget.title,
-          avatarImg: widget.avatarImg,
-          textStyle: _textStyle(widget.backgroundColor, widget.titleStyle),
-        ),
-        title: widget.title,
-        textStyle: _textStyle(widget.unselectedTextColor, widget.titleStyle),
-      );
+    if (widget.top != null) {
+      return widget.top;
+      //return CollapsibleItemWidget(
+      //   padding: widget.itemPadding,
+      //   offsetX: _offsetX,
+      //   scale: _fraction,
+      //   leading: CollapsibleAvatar(
+      //     backgroundColor: widget.unselectedIconColor,
+      //     avatarSize: widget.iconSize,
+      //     name: widget.title,
+      //     avatarImg: widget.avatarImg,
+      //     textStyle: _textStyle(widget.backgroundColor, widget.titleStyle),
+      //   ),
+      //   title: widget.title,
+      //   textStyle: _textStyle(widget.unselectedTextColor, widget.titleStyle),
+      // );
     } else {
       return SizedBox();
     }
