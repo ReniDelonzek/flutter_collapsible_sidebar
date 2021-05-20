@@ -14,7 +14,7 @@ export 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
 
 class CollapsibleSidebar extends StatefulWidget {
   const CollapsibleSidebar({
-    @required this.items,
+    required this.items,
     this.title = 'Lorem Ipsum',
     this.titleStyle,
     this.textStyle,
@@ -41,12 +41,12 @@ class CollapsibleSidebar extends StatefulWidget {
     this.bottomPadding = 0,
     this.fitItemsToBottom = false,
     this.top,
-    @required this.body,
+    required this.body,
   });
 
-  final Widget top;
+  final Widget? top;
   final String title, toggleTitle;
-  final TextStyle titleStyle, textStyle, toggleTitleStyle;
+  final TextStyle? titleStyle, textStyle, toggleTitleStyle;
   final Widget body;
   final avatarImg;
   final bool showToggleButton, fitItemsToBottom;
@@ -76,17 +76,24 @@ class CollapsibleSidebar extends StatefulWidget {
 
 class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _widthAnimation;
-  CurvedAnimation _curvedAnimation;
-  double tempWidth;
+  late AnimationController _controller;
+  late Animation<double> _widthAnimation;
+  late CurvedAnimation _curvedAnimation;
+  late double tempWidth;
 
   var _isCollapsed = true;
-  double _currWidth, _delta, _delta1By4, _delta3by4, _maxOffsetX, _maxOffsetY;
-  int _selectedItemIndex;
+  late double _currWidth,
+      _delta,
+      _delta1By4,
+      _delta3by4,
+      _maxOffsetX,
+      _maxOffsetY;
+  late int _selectedItemIndex;
 
   @override
   void initState() {
+    assert(widget.items.isNotEmpty);
+
     super.initState();
     _selectedItemIndex = 0;
 
@@ -132,13 +139,15 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   }
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
-    _currWidth += details.primaryDelta;
-    if (_currWidth > tempWidth)
-      _currWidth = tempWidth;
-    else if (_currWidth < widget.minWidth)
-      _currWidth = widget.minWidth;
-    else
-      setState(() {});
+    if (details.primaryDelta != null) {
+      _currWidth += details.primaryDelta!;
+      if (_currWidth > tempWidth)
+        _currWidth = tempWidth;
+      else if (_currWidth < widget.minWidth)
+        _currWidth = widget.minWidth;
+      else
+        setState(() {});
+    }
   }
 
   void _onHorizontalDragEnd(DragEndDetails _) {
@@ -239,22 +248,23 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   }
 
   Widget get _avatar {
+    if (widget.avatarImg != null)
+      return CollapsibleItemWidget(
+        padding: widget.itemPadding,
+        offsetX: _offsetX,
+        scale: _fraction,
+        leading: CollapsibleAvatar(
+          backgroundColor: widget.unselectedIconColor,
+          avatarSize: widget.iconSize,
+          name: widget.title,
+          avatarImg: widget.avatarImg,
+          textStyle: _textStyle(widget.backgroundColor, widget.titleStyle),
+        ),
+        title: widget.title,
+        textStyle: _textStyle(widget.unselectedTextColor, widget.titleStyle),
+      );
     if (widget.top != null) {
-      return widget.top;
-      //return CollapsibleItemWidget(
-      //   padding: widget.itemPadding,
-      //   offsetX: _offsetX,
-      //   scale: _fraction,
-      //   leading: CollapsibleAvatar(
-      //     backgroundColor: widget.unselectedIconColor,
-      //     avatarSize: widget.iconSize,
-      //     name: widget.title,
-      //     avatarImg: widget.avatarImg,
-      //     textStyle: _textStyle(widget.backgroundColor, widget.titleStyle),
-      //   ),
-      //   title: widget.title,
-      //   textStyle: _textStyle(widget.unselectedTextColor, widget.titleStyle),
-      // );
+      return widget.top!;
     } else {
       return SizedBox();
     }
@@ -333,7 +343,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   double get _currAngle => -math.pi * _fraction;
   double get _offsetX => _maxOffsetX * _fraction;
 
-  TextStyle _textStyle(Color color, TextStyle style) {
+  TextStyle _textStyle(Color color, TextStyle? style) {
     return style == null
         ? TextStyle(
             fontSize: 20,
