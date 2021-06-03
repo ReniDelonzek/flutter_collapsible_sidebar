@@ -41,10 +41,12 @@ class CollapsibleSidebar extends StatefulWidget {
     this.bottomPadding = 0,
     this.fitItemsToBottom = false,
     this.top,
+    this.topCollapsed,
     required this.body,
   });
 
   final Widget? top;
+  final Widget? topCollapsed;
   final String title, toggleTitle;
   final TextStyle? titleStyle, textStyle, toggleTitleStyle;
   final Widget body;
@@ -263,11 +265,13 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
         title: widget.title,
         textStyle: _textStyle(widget.unselectedTextColor, widget.titleStyle),
       );
+    if (_isCollapsed && widget.topCollapsed != null) {
+      return widget.topCollapsed!;
+    }
     if (widget.top != null) {
       return widget.top!;
-    } else {
-      return SizedBox();
     }
+    return SizedBox();
   }
 
   List<Widget> get _items {
@@ -284,11 +288,13 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
           padding: widget.itemPadding,
           offsetX: _offsetX,
           scale: _fraction,
-          leading: Icon(
-            item.icon,
-            size: widget.iconSize,
-            color: iconColor,
-          ),
+          leading: RotatedBox(
+              quarterTurns: item.rotation,
+              child: Icon(
+                item.icon,
+                size: widget.iconSize,
+                color: iconColor,
+              )),
           title: item.text,
           textStyle: _textStyle(textColor, widget.textStyle),
           onTap: () {

@@ -8,12 +8,14 @@ class CollapsibleItem extends BaseCollapsibleItem {
     required this.text,
     required this.icon,
     required this.onPressed,
+    this.rotation = 0,
     this.isSelected = false,
   });
 
   final String text;
   final IconData icon;
   final Function onPressed;
+  final int rotation;
   bool isSelected;
 }
 
