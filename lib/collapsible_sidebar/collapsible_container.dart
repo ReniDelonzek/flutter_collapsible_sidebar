@@ -21,17 +21,7 @@ class CollapsibleContainer extends StatelessWidget {
       width: width,
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        color: color,
-        boxShadow: [
-          BoxShadow(
-            color: color,
-            blurRadius: 10,
-            spreadRadius: 0.01,
-            offset: Offset(3, 3),
-          ),
-        ],
-      ),
+          borderRadius: BorderRadius.circular(borderRadius), color: color),
       child: child,
     );
   }
