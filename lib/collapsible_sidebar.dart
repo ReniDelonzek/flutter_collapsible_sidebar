@@ -8,42 +8,41 @@ import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item_selection.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_avatar.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item_widget.dart';
-import 'package:flutter/rendering.dart';
 
 export 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
 
 class CollapsibleSidebar extends StatefulWidget {
-  const CollapsibleSidebar({
-    required this.items,
-    this.title = 'Lorem Ipsum',
-    this.titleStyle,
-    this.textStyle,
-    this.toggleTitleStyle,
-    this.toggleTitle = 'Collapse',
-    this.avatarImg,
-    this.height = double.infinity,
-    this.minWidth = 80,
-    this.maxWidth = 270,
-    this.borderRadius = 15,
-    this.iconSize = 40,
-    this.toggleButtonIcon = Icons.chevron_right,
-    this.backgroundColor = const Color(0xff2B3138),
-    this.selectedIconBox = const Color(0xff2F4047),
-    this.selectedIconColor = const Color(0xff4AC6EA),
-    this.selectedTextColor = const Color(0xffF3F7F7),
-    this.unselectedIconColor = const Color(0xff6A7886),
-    this.unselectedTextColor = const Color(0xffC0C7D0),
-    this.duration = const Duration(milliseconds: 500),
-    this.curve = Curves.fastLinearToSlowEaseIn,
-    this.screenPadding = 4,
-    this.showToggleButton = true,
-    this.topPadding = 0,
-    this.bottomPadding = 0,
-    this.fitItemsToBottom = false,
-    this.top,
-    this.topCollapsed,
-    required this.body,
-  });
+  const CollapsibleSidebar(
+      {required this.items,
+      this.title = 'Lorem Ipsum',
+      this.titleStyle,
+      this.textStyle,
+      this.toggleTitleStyle,
+      this.toggleTitle = 'Collapse',
+      this.avatarImg,
+      this.height = double.infinity,
+      this.minWidth = 80,
+      this.maxWidth = 270,
+      this.borderRadius = 15,
+      this.iconSize = 40,
+      this.toggleButtonIcon = Icons.chevron_right,
+      this.backgroundColor = const Color(0xff2B3138),
+      this.selectedIconBox = const Color(0xff2F4047),
+      this.selectedIconColor = const Color(0xff4AC6EA),
+      this.selectedTextColor = const Color(0xffF3F7F7),
+      this.unselectedIconColor = const Color(0xff6A7886),
+      this.unselectedTextColor = const Color(0xffC0C7D0),
+      this.duration = const Duration(milliseconds: 500),
+      this.curve = Curves.fastLinearToSlowEaseIn,
+      this.screenPadding = 4,
+      this.showToggleButton = true,
+      this.topPadding = 0,
+      this.bottomPadding = 0,
+      this.fitItemsToBottom = false,
+      this.top,
+      this.topCollapsed,
+      required this.body,
+      this.scrollController});
 
   final Widget? top;
   final Widget? topCollapsed;
@@ -72,6 +71,7 @@ class CollapsibleSidebar extends StatefulWidget {
       unselectedTextColor;
   final Duration duration;
   final Curve curve;
+  final ScrollController? scrollController;
   @override
   _CollapsibleSidebarState createState() => _CollapsibleSidebarState();
 }
@@ -204,6 +204,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                       SizedBox(height: widget.topPadding),
                       Expanded(
                         child: SingleChildScrollView(
+                          controller: widget.scrollController,
                           physics: BouncingScrollPhysics(),
                           reverse: widget.fitItemsToBottom,
                           child: Stack(
