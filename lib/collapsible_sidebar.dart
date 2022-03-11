@@ -367,6 +367,14 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   }
 
   double getOffsetY() {
+    int index = widget.items.indexWhere(
+        (element) => element is CollapsibleItem && element.isSelected);
+    if (index > -1) {
+      _selectedItemIndex = index;
+    } else {
+      _selectedItemIndex = 0;
+    }
+
     double offSet = 0;
     widget.items.sublist(0, _selectedItemIndex).forEach((element) {
       if (element is CollapsibleItem) {
